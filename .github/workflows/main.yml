@@ -1,0 +1,45 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  backend-build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14.18.0' 
+    - name: Install backend dependencies
+      run: npm install
+    - name: Run backend tests
+      run: npm test
+
+  frontend-build-and-test:
+    needs: backend-build-and-test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14.18.0'
+    - name: Install frontend dependencies
+      run: npm install
+    - name: Run frontend tests
+      run: npm test
+    - name: Build frontend
+      run: npm run build
+
